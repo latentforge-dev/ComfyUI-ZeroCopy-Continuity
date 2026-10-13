@@ -1,0 +1,115 @@
+{
+  "1": {
+    "inputs": {
+      "unet_name": "minimax_h3_fused_refdelta_r1024_turbo8_mystic07_int8_convrot.safetensors",
+      "weight_dtype": "default"
+    },
+    "class_type": "UNETLoader"
+  },
+  "2": {
+    "inputs": {
+      "clip_name": "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+      "type": "minimax",
+      "weight_dtype": "default"
+    },
+    "class_type": "CLIPLoader"
+  },
+  "3": {
+    "inputs": {
+      "vae_name": "minimax_h3_video_vae_fp16.safetensors"
+    },
+    "class_type": "VAELoader"
+  },
+  "4": {
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "enable_pinning": true,
+      "tune_allocator": true
+    },
+    "class_type": "ZeroCopyVRAMPin"
+  },
+  "5": {
+    "inputs": {
+      "image": "example_keyframe.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage"
+  },
+  "6": {
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ],
+      "prompt": "Cinematic low-angle tracking shot through a misty cyberpunk alley at night. Cold volumetric neon light reflections, continuous smooth camera motion, photorealistic 24fps motion stability.",
+      "width": 1280,
+      "height": 768,
+      "length": 192,
+      "fallback_first_frame": [
+        "5",
+        0
+      ],
+      "buffer_tag": "scene_continuity",
+      "continuity_mode": "blend_with_fallback",
+      "blend_ratio": 0.75
+    },
+    "class_type": "ZeroCopyLatentHandoff"
+  },
+  "7": {
+    "inputs": {
+      "seed": 42,
+      "steps": 8,
+      "cfg": 1.0,
+      "sampler_name": "res_multistep",
+      "scheduler": "simple",
+      "denoise": 1.0,
+      "model": [
+        "4",
+        0
+      ],
+      "positive": [
+        "6",
+        0
+      ],
+      "negative": [
+        "6",
+        0
+      ],
+      "latent_image": [
+        "6",
+        1
+      ]
+    },
+    "class_type": "KSampler"
+  },
+  "8": {
+    "inputs": {
+      "samples": [
+        "7",
+        0
+      ],
+      "buffer_tag": "scene_continuity"
+    },
+    "class_type": "ZeroCopyLatentStore"
+  },
+  "9": {
+    "inputs": {
+      "samples": [
+        "8",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ]
+    },
+    "class_type": "VAEDecode"
+  }
+}
