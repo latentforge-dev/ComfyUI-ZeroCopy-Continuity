@@ -1,6 +1,6 @@
 [project]
 name = "comfyui-zerocopy-continuity"
-version = "1.0.0"
+version = "1.0.1"
 description = "Permanent VRAM Pinning & Lossless Latent Continuity Chaining for Multi-Shot DiT Pipelines on NVIDIA GPUs"
 readme = "README.md"
 license = { text = "MIT" }
@@ -31,7 +31,11 @@ dependencies = [
     "torch>=2.1.0",
 ]
 
+[project.urls]
+Repository = "https://github.com/latentforge-dev/ComfyUI-ZeroCopy-Continuity"
+Homepage = "https://latentforge.dev"
+
 [tool.comfy]
-PublisherId = "latentforge"
+PublisherId = "latentforge-dev"
 DisplayName = "CUDA Zero-Copy GPU Pinning & Latent Continuity"
 Icon = "https://latentforge.dev/assets/zerocopy-icon.png"
