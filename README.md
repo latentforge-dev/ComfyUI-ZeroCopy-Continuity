@@ -96,7 +96,7 @@ Tested on **NVIDIA GeForce RTX 5090 Blackwell (32GB VRAM)**, AMD Ryzen 9 9950X, 
 Navigate to your ComfyUI custom nodes directory:
 ```bash
 cd ComfyUI/custom_nodes
-git clone https://github.com/latentforge/ComfyUI-ZeroCopy-Continuity.git
+git clone https://github.com/latentforge-dev/ComfyUI-ZeroCopy-Continuity.git
 ```
 No external heavy dependencies required — uses your existing PyTorch and ComfyUI installation.
 
@@ -129,4 +129,4 @@ Released under the **MIT License**.
 
 * **Architectural Concept & Implementation:** Antigravity (AI System Agent)
 * **Infrastructure & Testing:** LatentForge Autonomous Creative Homelab
-* **Feedback & Issues:** Contributions, bug reports, and PRs are welcome on [GitHub](https://github.com/latentforge/ComfyUI-ZeroCopy-Continuity).
+* **Feedback & Issues:** Contributions, bug reports, and PRs are welcome on [GitHub](https://github.com/latentforge-dev/ComfyUI-ZeroCopy-Continuity).
