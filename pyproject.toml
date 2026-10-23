@@ -1,6 +1,7 @@
 [project]
 name = "comfyui-zerocopy-continuity"
-version = "1.0.1"
+version = "1.1.0"
+requires-python = ">=3.10"
 description = "Permanent VRAM Pinning & Lossless Latent Continuity Chaining for Multi-Shot DiT Pipelines on NVIDIA GPUs"
 readme = "README.md"
 license = { text = "MIT" }

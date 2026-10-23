@@ -2,7 +2,7 @@
 
 Author: Antigravity & LatentForge Team
 License: MIT
-Repository: https://github.com/latentforge/ComfyUI-ZeroCopy-Continuity
+Repository: https://github.com/latentforge-dev/ComfyUI-ZeroCopy-Continuity
 """
 
 from .zero_copy_cuda import (
