@@ -1,0 +1,128 @@
+{
+  "id": "8f4b2e19-6c3a-4d8f-9b12-7e5a3c09d4e1",
+  "lora_motion": {
+    "class_type": "WanVideoLoraSelectByName",
+    "inputs": {
+      "lora_name": "wan21/singularunity-wan2.1-motioncraft.safetensors",
+      "strength": 0.85,
+      "merge_loras": true
+    }
+  },
+  "model_loader": {
+    "class_type": "WanVideoModelLoader",
+    "inputs": {
+      "model": "wan2.1_i2v_720p_14B_fp8_e4m3fn.safetensors",
+      "base_precision": "bf16",
+      "quantization": "fp8_e4m3fn",
+      "load_device": "offload_device",
+      "attention_mode": "sageattn",
+      "lora": ["lora_motion", 0]
+    }
+  },
+  "vae_loader": {
+    "class_type": "WanVideoVAELoader",
+    "inputs": {
+      "model_name": "wan_2.1_vae.safetensors",
+      "precision": "bf16"
+    }
+  },
+  "text_encoder": {
+    "class_type": "LoadWanVideoT5TextEncoder",
+    "inputs": {
+      "model_name": "umt5-xxl-enc-fp8_e4m3fn.safetensors",
+      "precision": "bf16",
+      "load_device": "offload_device"
+    }
+  },
+  "clip_vision": {
+    "class_type": "CLIPVisionLoader",
+    "inputs": {
+      "clip_name": "clip_vision_h.safetensors"
+    }
+  },
+  "input_image": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "bayou_master_keyframe.png"
+    }
+  },
+  "clip_vision_encode": {
+    "class_type": "WanVideoClipVisionEncode",
+    "inputs": {
+      "clip_vision": ["clip_vision", 0],
+      "image_1": ["input_image", 0],
+      "strength_1": 1.0,
+      "strength_2": 1.0,
+      "crop": "center",
+      "combine_embeds": "average",
+      "force_offload": true
+    }
+  },
+  "text_encode": {
+    "class_type": "WanVideoTextEncode",
+    "inputs": {
+      "positive_prompt": "cinematic medium close-up, authentic 35mm film grain, 24fps fluid physical motion. A gentle intimate moment in the dark misty Louisiana bayou riverbank. The beautiful young woman softly strokes the lower jaw and cheek of the ancient emerald-green saurian humanoid creature with her delicate fingertips. The creature blinks its golden reptilian slit eyes slowly, gently leaning its massive reptilian head further into her warm hand with a contented, deep chest breath. Water gently ripples and laps around their bodies in the dark glassy water. Moonlight glints on water droplets clinging to her wet hair and the iridescent wet scales of the creature. Hyper-realistic tactile physical motion, perfect anatomical stability, cinematic masterpiece.",
+      "negative_prompt": "spinning camera, camera orbit, camera pan, 360 rotation, camera movement, blurry, low quality, morphed limbs, extra arms, clipping hands, cartoon, 3d render, plastic skin, still image, static freeze, frozen frame, motionless, statue, white outline, white contour line",
+      "t5": ["text_encoder", 0],
+      "force_offload": true,
+      "device": "gpu"
+    }
+  },
+  "i2v_encode": {
+    "class_type": "WanVideoImageToVideoEncode",
+    "inputs": {
+      "vae": ["vae_loader", 0],
+      "start_image": ["input_image", 0],
+      "clip_embeds": ["clip_vision_encode", 0],
+      "width": 832,
+      "height": 480,
+      "num_frames": 81,
+      "noise_aug_strength": 0.05,
+      "start_latent_strength": 0.80,
+      "end_latent_strength": 1.0,
+      "augment_empty_frames": 0.0,
+      "force_offload": false
+    }
+  },
+  "sampler": {
+    "class_type": "WanVideoSampler",
+    "inputs": {
+      "model": ["model_loader", 0],
+      "image_embeds": ["i2v_encode", 0],
+      "text_embeds": ["text_encode", 0],
+      "steps": 25,
+      "cfg": 4.5,
+      "shift": 5.0,
+      "seed": 428192,
+      "force_offload": true,
+      "scheduler": "unipc",
+      "riflex_freq_index": 0
+    }
+  },
+  "decode": {
+    "class_type": "WanVideoDecode",
+    "inputs": {
+      "vae": ["vae_loader", 0],
+      "samples": ["sampler", 0],
+      "enable_vae_tiling": true,
+      "tile_x": 272,
+      "tile_y": 272,
+      "tile_stride_x": 144,
+      "tile_stride_y": 128
+    }
+  },
+  "video_save": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "images": ["decode", 0],
+      "frame_rate": 24.0,
+      "loop_count": 0,
+      "filename_prefix": "CineFlux_Bayou_Master_Wan21",
+      "format": "video/h264-mp4",
+      "pix_fmt": "yuv420p",
+      "crf": 18,
+      "pingpong": false,
+      "save_output": true
+    }
+  }
+}
