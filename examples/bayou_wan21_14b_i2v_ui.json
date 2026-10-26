@@ -1,0 +1,608 @@
+{
+  "id": "ec6664f5-3e44-479f-9610-3eb7b7fb32ed",
+  "revision": 0,
+  "last_node_id": 12,
+  "last_link_id": 14,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "WanVideoLoraSelectByName",
+      "pos": [
+        -800,
+        100
+      ],
+      "size": [
+        340,
+        120
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "lora",
+          "type": "WANLORA",
+          "links": [
+            1
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WanVideoLoraSelectByName"
+      },
+      "widgets_values": [
+        "wan21/singularunity-wan2.1-motioncraft.safetensors",
+        0.85,
+        true
+      ]
+    },
+    {
+      "id": 2,
+      "type": "WanVideoModelLoader",
+      "pos": [
+        -420,
+        100
+      ],
+      "size": [
+        340,
+        160
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "lora",
+          "type": "WANLORA",
+          "link": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "model",
+          "type": "WANVIDEOMODEL",
+          "links": [
+            2
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WanVideoModelLoader"
+      },
+      "widgets_values": [
+        "wan2.1_i2v_720p_14B_fp8_e4m3fn.safetensors",
+        "bf16",
+        "fp8_e4m3fn",
+        "offload_device",
+        "sageattn"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "WanVideoVAELoader",
+      "pos": [
+        -800,
+        280
+      ],
+      "size": [
+        340,
+        100
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "vae",
+          "type": "WANVIDEOVAE",
+          "links": [
+            3,
+            11
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WanVideoVAELoader"
+      },
+      "widgets_values": [
+        "wan_2.1_vae.safetensors",
+        "bf16"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "LoadWanVideoT5TextEncoder",
+      "pos": [
+        -800,
+        440
+      ],
+      "size": [
+        340,
+        120
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "t5",
+          "type": "WANVIDEOT5",
+          "links": [
+            4
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadWanVideoT5TextEncoder"
+      },
+      "widgets_values": [
+        "umt5-xxl-enc-fp8_e4m3fn.safetensors",
+        "bf16",
+        "offload_device"
+      ]
+    },
+    {
+      "id": 5,
+      "type": "CLIPVisionLoader",
+      "pos": [
+        -800,
+        620
+      ],
+      "size": [
+        340,
+        80
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "clip_vision",
+          "type": "CLIP_VISION",
+          "links": [
+            5
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPVisionLoader"
+      },
+      "widgets_values": [
+        "clip_vision_h.safetensors"
+      ]
+    },
+    {
+      "id": 6,
+      "type": "LoadImage",
+      "pos": [
+        -800,
+        760
+      ],
+      "size": [
+        340,
+        300
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            6,
+            7
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "bayou_master_keyframe.png",
+        "image"
+      ]
+    },
+    {
+      "id": 7,
+      "type": "WanVideoClipVisionEncode",
+      "pos": [
+        -420,
+        620
+      ],
+      "size": [
+        340,
+        200
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip_vision",
+          "type": "CLIP_VISION",
+          "link": 5
+        },
+        {
+          "name": "image_1",
+          "type": "IMAGE",
+          "link": 6
+        }
+      ],
+      "outputs": [
+        {
+          "name": "clip_embeds",
+          "type": "WANCLIPEMBEDS",
+          "links": [
+            8
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WanVideoClipVisionEncode"
+      },
+      "widgets_values": [
+        1.0,
+        1.0,
+        "center",
+        "average",
+        true
+      ]
+    },
+    {
+      "id": 8,
+      "type": "WanVideoTextEncode",
+      "pos": [
+        -420,
+        320
+      ],
+      "size": [
+        340,
+        240
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "t5",
+          "type": "WANVIDEOT5",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text_embeds",
+          "type": "WANTEXTEMBEDS",
+          "links": [
+            9
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WanVideoTextEncode"
+      },
+      "widgets_values": [
+        "cinematic medium close-up, authentic 35mm film grain, 24fps fluid physical motion. A gentle intimate moment in the dark misty Louisiana bayou riverbank. The beautiful young woman softly strokes the lower jaw and cheek of the ancient emerald-green saurian humanoid creature with her delicate fingertips. The creature blinks its golden reptilian slit eyes slowly, gently leaning its massive reptilian head further into her warm hand with a contented, deep chest breath. Water gently ripples and laps around their bodies in the dark glassy water. Moonlight glints on water droplets clinging to her wet hair and the iridescent wet scales of the creature. Hyper-realistic tactile physical motion, perfect anatomical stability, cinematic masterpiece.",
+        "spinning camera, camera orbit, camera pan, 360 rotation, camera movement, blurry, low quality, morphed limbs, extra arms, clipping hands, cartoon, 3d render, plastic skin, still image, static freeze, frozen frame, motionless, statue, white outline, white contour line",
+        true,
+        "gpu"
+      ]
+    },
+    {
+      "id": 9,
+      "type": "WanVideoImageToVideoEncode",
+      "pos": [
+        0,
+        620
+      ],
+      "size": [
+        340,
+        260
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "vae",
+          "type": "WANVIDEOVAE",
+          "link": 3
+        },
+        {
+          "name": "start_image",
+          "type": "IMAGE",
+          "link": 7
+        },
+        {
+          "name": "clip_embeds",
+          "type": "WANCLIPEMBEDS",
+          "link": 8
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image_embeds",
+          "type": "WANIMAGEEMBEDS",
+          "links": [
+            10
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WanVideoImageToVideoEncode"
+      },
+      "widgets_values": [
+        832,
+        480,
+        81,
+        0.05,
+        0.8,
+        1.0,
+        0.0,
+        false
+      ]
+    },
+    {
+      "id": 10,
+      "type": "WanVideoSampler",
+      "pos": [
+        400,
+        320
+      ],
+      "size": [
+        340,
+        280
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "WANVIDEOMODEL",
+          "link": 2
+        },
+        {
+          "name": "image_embeds",
+          "type": "WANIMAGEEMBEDS",
+          "link": 10
+        },
+        {
+          "name": "text_embeds",
+          "type": "WANTEXTEMBEDS",
+          "link": 9
+        }
+      ],
+      "outputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "links": [
+            12
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WanVideoSampler"
+      },
+      "widgets_values": [
+        25,
+        4.5,
+        5.0,
+        428192,
+        true,
+        "unipc",
+        0
+      ]
+    },
+    {
+      "id": 11,
+      "type": "WanVideoDecode",
+      "pos": [
+        800,
+        320
+      ],
+      "size": [
+        320,
+        200
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "vae",
+          "type": "WANVIDEOVAE",
+          "link": 11
+        },
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 12
+        }
+      ],
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": [
+            13
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WanVideoDecode"
+      },
+      "widgets_values": [
+        true,
+        272,
+        272,
+        144,
+        128
+      ]
+    },
+    {
+      "id": 12,
+      "type": "VHS_VideoCombine",
+      "pos": [
+        1180,
+        320
+      ],
+      "size": [
+        320,
+        300
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 13
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "VHS_VideoCombine"
+      },
+      "widgets_values": [
+        24.0,
+        0,
+        "CineFlux_Bayou_Master_Wan21",
+        "video/h264-mp4",
+        "yuv420p",
+        18,
+        false,
+        true
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      1,
+      0,
+      2,
+      0,
+      "WANLORA"
+    ],
+    [
+      2,
+      2,
+      0,
+      10,
+      0,
+      "WANVIDEOMODEL"
+    ],
+    [
+      3,
+      3,
+      0,
+      9,
+      0,
+      "WANVIDEOVAE"
+    ],
+    [
+      4,
+      4,
+      0,
+      8,
+      0,
+      "WANVIDEOT5"
+    ],
+    [
+      5,
+      5,
+      0,
+      7,
+      0,
+      "CLIP_VISION"
+    ],
+    [
+      6,
+      6,
+      0,
+      7,
+      1,
+      "IMAGE"
+    ],
+    [
+      7,
+      6,
+      0,
+      9,
+      1,
+      "IMAGE"
+    ],
+    [
+      8,
+      7,
+      0,
+      9,
+      2,
+      "WANCLIPEMBEDS"
+    ],
+    [
+      9,
+      8,
+      0,
+      10,
+      2,
+      "WANTEXTEMBEDS"
+    ],
+    [
+      10,
+      9,
+      0,
+      10,
+      1,
+      "WANIMAGEEMBEDS"
+    ],
+    [
+      11,
+      3,
+      0,
+      11,
+      0,
+      "WANVIDEOVAE"
+    ],
+    [
+      12,
+      10,
+      0,
+      11,
+      1,
+      "LATENT"
+    ],
+    [
+      13,
+      11,
+      0,
+      12,
+      0,
+      "IMAGE"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {},
+  "version": 0.4
+}
