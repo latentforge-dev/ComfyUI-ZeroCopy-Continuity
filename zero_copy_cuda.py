@@ -537,6 +537,16 @@ class CineFluxZeroCopyLatentHandoff:
                         "tooltip": "1.0 = 100% prior shot latent; 0.0 = 100% fallback image.",
                     },
                 ),
+                "tail_latent_frames": (
+                    "INT",
+                    {
+                        "default": 1,
+                        "min": 1,
+                        "max": 16,
+                        "step": 1,
+                        "tooltip": "Number of terminal latent frames to hand off from prior shot (1 = single cut keyframe; >1 = multi-frame temporal/motion context buffer).",
+                    },
+                ),
             },
         }
 
@@ -557,6 +567,7 @@ class CineFluxZeroCopyLatentHandoff:
         buffer_tag: str = "shot_continuity",
         continuity_mode: str = "zero_copy_latent_only",
         blend_ratio: float = 1.0,
+        tail_latent_frames: int = 1,
     ) -> Tuple[Any, Dict[str, Any]]:
         """Executes zero-copy latent injection or graceful fallback keyframing.
 
@@ -571,6 +582,7 @@ class CineFluxZeroCopyLatentHandoff:
             buffer_tag: Ring buffer lookup tag.
             continuity_mode: Mode of operation.
             blend_ratio: Blending interpolation factor.
+            tail_latent_frames: Number of terminal latent frames to retrieve.
 
         Returns:
             Tuple of (positive conditioning, initial latent dictionary).
@@ -587,20 +599,24 @@ class CineFluxZeroCopyLatentHandoff:
         # 2. Check for resident CUDA latent in ZeroCopy buffer
         resident_tail_latent: Optional[torch.Tensor] = None
         if continuity_mode in ("zero_copy_latent_only", "blend_with_fallback") and LATENT_BUFFER.has_latent(buffer_tag):
-            resident_tail_latent = LATENT_BUFFER.get_tail_slice(buffer_tag, num_frames=1)
+            resident_tail_latent = LATENT_BUFFER.get_tail_slice(buffer_tag, num_frames=max(1, tail_latent_frames))
             if resident_tail_latent is not None:
                 # Spatial alignment guarantee: if previous shot had different resolution, interpolate to target
                 if resident_tail_latent.shape[3] != target_lat_h or resident_tail_latent.shape[4] != target_lat_w:
-                    resident_tail_latent = torch.nn.functional.interpolate(
-                        resident_tail_latent.squeeze(2),
+                    B, C, T, H, W = resident_tail_latent.shape
+                    reshaped = resident_tail_latent.permute(0, 2, 1, 3, 4).reshape(B * T, C, H, W)
+                    interpolated = torch.nn.functional.interpolate(
+                        reshaped,
                         size=(target_lat_h, target_lat_w),
                         mode="bilinear",
                         align_corners=False,
-                    ).unsqueeze(2)
+                    )
+                    resident_tail_latent = interpolated.reshape(B, T, C, target_lat_h, target_lat_w).permute(0, 2, 1, 3, 4)
                 LOG.info(
-                    "Zero-Copy Latent Handoff ACTIVE: Retrieved tail latent slice %s on %s.",
+                    "Zero-Copy Latent Handoff ACTIVE: Retrieved tail latent slice %s on %s (frames=%d).",
                     resident_tail_latent.shape,
                     resident_tail_latent.device,
+                    max(1, tail_latent_frames),
                 )
 
         # 3. Prepare visual conditioning tokens for CLIP
