@@ -143,6 +143,9 @@ class ZeroCopyCudaManager:
         try:
             loaded_model_cls = comfy.model_management.LoadedModel
             original_unload = loaded_model_cls.model_unload
+            if getattr(original_unload, "_is_zerocopy_hook", False):
+                self._hooks_installed = True
+                return
 
             def pinned_model_unload(loaded_self: Any, memory_to_free: Optional[int] = None, unpatch_weights: bool = True) -> bool:
                 # Inspect model patcher for pinning flag
@@ -153,6 +156,7 @@ class ZeroCopyCudaManager:
                     return False
                 return original_unload(loaded_self, memory_to_free=memory_to_free, unpatch_weights=unpatch_weights)
 
+            pinned_model_unload._is_zerocopy_hook = True  # type: ignore[attr-defined]
             loaded_model_cls.model_unload = pinned_model_unload
             self._hooks_installed = True
             LOG.info("Installed ComfyUI LoadedModel anti-eviction hook for Zero-Copy VRAM pinning.")
